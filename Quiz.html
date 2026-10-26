@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 2 Quiz · AI in Digital Business</title>
+<style>
+:root{
+  --bg:#f4f1ea; --card:#ffffff; --ink:#1b1f24; --muted:#5d6670; --line:#e2ddd2;
+  --accent:#1f4e79; --accent-soft:#e6eef6; --ok:#1e7a46; --ok-soft:#e3f3ea;
+  --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#b26a00; --idle:#8a9199; --idle-soft:#eef0f2;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171b; --card:#1e2329; --ink:#eef1f4; --muted:#a3acb6; --line:#323a43;
+    --accent:#7fb2e5; --accent-soft:#22313f; --ok:#5cc98a; --ok-soft:#1b3326;
+    --bad:#f0857c; --bad-soft:#3a2120; --warn:#f0b25a; --idle:#7d8690; --idle-soft:#2a3038;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height:1.5; min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  padding:24px 16px 40px;
+  -webkit-user-select:none; user-select:none;
+}
+input{-webkit-user-select:text;user-select:text}
+.wrap{width:100%; max-width:760px}
+.brand{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;
+  font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:14px}
+.brand b{color:var(--accent); font-weight:700}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:28px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.05)}
+h1{font-family:Georgia,"Times New Roman",serif; font-weight:700; font-size:28px; line-height:1.2; margin:0 0 8px}
+h2{font-size:15px; margin:22px 0 8px}
+p{margin:0 0 12px}
+.lead{color:var(--muted); margin-bottom:20px}
+.rules{list-style:none; padding:0; margin:0 0 20px; display:grid; gap:8px}
+.rules li{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:var(--accent-soft); border-radius:10px; font-size:14.5px}
+.rules li span.n{flex:0 0 22px; height:22px; border-radius:50%; background:var(--accent); color:var(--card);
+  font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:1px}
+.field{display:grid; gap:6px; margin-bottom:14px}
+.field label{font-size:13px; font-weight:600}
+.field input{font:inherit; font-size:16px; padding:11px 12px; border:1px solid var(--line); border-radius:10px;
+  background:var(--bg); color:var(--ink)}
+.field input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:transparent}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:560px){ .row2{grid-template-columns:1fr} .card{padding:20px} h1{font-size:24px} }
+.check{display:flex; gap:10px; align-items:flex-start; font-size:14px; margin:6px 0 18px; cursor:pointer}
+.check input{margin-top:3px; width:18px; height:18px; accent-color:var(--accent)}
+.btn{font:inherit; font-weight:700; font-size:15px; border:0; border-radius:10px; padding:13px 20px;
+  background:var(--accent); color:var(--card); cursor:pointer; width:100%}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn:not(:disabled):hover{filter:brightness(1.08)}
+.err{color:var(--bad); font-size:13.5px; min-height:18px; margin-bottom:8px}
+
+/* Quiz screen */
+.qtop{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:6px}
+.qcount{font-size:13px; font-weight:700; color:var(--muted); letter-spacing:.04em}
+.qcount b{color:var(--ink)}
+.timer{display:flex; align-items:center; gap:8px; font-variant-numeric:tabular-nums; font-weight:800; font-size:22px; color:var(--accent)}
+.timer svg{width:34px; height:34px; transform:rotate(-90deg)}
+.timer circle{fill:none; stroke-width:4}
+.timer .trk{stroke:var(--line)}
+.timer .arc{stroke:currentColor; stroke-linecap:round; transition:stroke-dashoffset .2s linear}
+.timer.low{color:var(--bad)}
+.progress{height:4px; background:var(--line); border-radius:4px; overflow:hidden; margin:10px 0 22px}
+.progress i{display:block; height:100%; background:var(--accent); transition:width .3s}
+.topic{display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--accent); background:var(--accent-soft); padding:4px 9px; border-radius:20px; margin-bottom:12px}
+.scenario{font-size:17px; margin:0 0 20px}
+.opts{display:grid; gap:10px; margin-bottom:20px}
+.opt{display:flex; gap:12px; align-items:flex-start; text-align:left; font:inherit; font-size:15.5px; color:var(--ink);
+  background:var(--card); border:1.5px solid var(--line); border-radius:12px; padding:13px 14px; cursor:pointer; width:100%}
+.opt:hover{border-color:var(--accent)}
+.opt .k{flex:0 0 28px; height:28px; border-radius:8px; border:1.5px solid var(--line); display:flex; align-items:center;
+  justify-content:center; font-weight:800; font-size:13px; color:var(--muted)}
+.opt.sel{border-color:var(--accent); background:var(--accent-soft)}
+.opt.sel .k{background:var(--accent); border-color:var(--accent); color:var(--card)}
+.hint{font-size:12.5px; color:var(--muted); text-align:center; margin-top:10px}
+.notice{font-size:13.5px; background:var(--bad-soft); color:var(--bad); border-radius:10px; padding:10px 12px; margin-bottom:16px}
+
+/* Results */
+.res-head{display:flex; justify-content:space-between; gap:16px; align-items:flex-start; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:18px}
+.who .lbl{font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.who .name{font-family:Georgia,serif; font-size:26px; font-weight:700; line-height:1.2}
+.score{text-align:right}
+.score .big{font-size:44px; font-weight:800; line-height:1; color:var(--accent); font-variant-numeric:tabular-nums}
+.score .big small{font-size:22px; color:var(--muted); font-weight:700}
+.score .pct{font-size:14px; color:var(--muted); font-weight:600; margin-top:4px}
+.meta{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:10px; margin-bottom:18px}
+.meta > div{background:var(--bg); border-radius:10px; padding:10px 12px}
+.meta .l{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); white-space:nowrap}
+.meta .v{font-weight:700; font-variant-numeric:tabular-nums; font-size:14px; white-space:nowrap}
+.grid{display:grid; grid-template-columns:repeat(10,1fr); gap:6px; margin-bottom:10px}
+@media (max-width:480px){ .grid{grid-template-columns:repeat(5,1fr)} }
+.cell{border-radius:8px; padding:7px 0; text-align:center; font-size:12px; font-weight:800}
+.cell span{display:block; font-size:14px}
+.c-ok{background:var(--ok-soft); color:var(--ok)}
+.c-bad{background:var(--bad-soft); color:var(--bad)}
+.c-to{background:var(--idle-soft); color:var(--idle)}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); margin-bottom:18px}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px}
+.shot{border:2px dashed var(--accent); border-radius:12px; padding:14px 16px; background:var(--accent-soft); font-size:14.5px}
+.shot b{color:var(--accent)}
+.banner{font-size:13.5px; font-weight:600; border-radius:10px; padding:10px 12px; margin-bottom:16px; background:var(--idle-soft); color:var(--muted)}
+.preview{background:var(--bad); color:#fff; text-align:center; font-weight:800; letter-spacing:.1em; padding:6px; border-radius:8px; margin-bottom:14px; font-size:12px}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span><b>AI in Digital Business</b> · Session 2</span><span>EMLV Paris · MSc / DBA</span></div>
+  <div id="previewBar" class="preview hidden">TEACHER PREVIEW · NOT A VALID ATTEMPT</div>
+
+  <!-- START -->
+  <section id="screen-start" class="card hidden">
+    <h1>Data Engineering Foundations and the ML Pipeline</h1>
+    <p class="lead">Scenario-based quiz · 20 questions</p>
+    <ul class="rules">
+      <li><span class="n">1</span><span>One question per screen. You have <b>35 seconds</b> for each question.</span></li>
+      <li><span class="n">2</span><span>When time runs out, the answer you selected (if any) is submitted and the next question appears. You cannot go back.</span></li>
+      <li><span class="n">3</span><span>You have <b>one attempt only</b>. Do not refresh or close the page: a refreshed question is counted as unanswered.</span></li>
+      <li><span class="n">4</span><span>Stay on this tab. Leaving it is recorded on your results.</span></li>
+      <li><span class="n">5</span><span>At the end, <b>take a screenshot of your results</b> and submit it.</span></li>
+    </ul>
+    <div class="row2">
+      <div class="field"><label for="lastName">Family name</label><input id="lastName" autocomplete="family-name" maxlength="60"></div>
+      <div class="field"><label for="firstName">First name</label><input id="firstName" autocomplete="given-name" maxlength="60"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="honour"><span>I confirm that I am the student named above and that I will complete this quiz on my own.</span></label>
+    <div class="err" id="startErr"></div>
+    <button class="btn" id="startBtn" disabled>Start the quiz</button>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="screen-quiz" class="card hidden">
+    <div id="reloadNotice" class="notice hidden"></div>
+    <div class="qtop">
+      <div class="qcount">QUESTION <b id="qNum">1</b> / <span id="qTotal">20</span></div>
+      <div class="timer" id="timer" aria-live="off">
+        <svg viewBox="0 0 36 36"><circle class="trk" cx="18" cy="18" r="15"/><circle class="arc" id="arc" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="0"/></svg>
+        <span id="tLeft">35</span>
+      </div>
+    </div>
+    <div class="progress"><i id="bar" style="width:0%"></i></div>
+    <div class="topic" id="qTopic"></div>
+    <p class="scenario" id="qText"></p>
+    <div class="opts" id="qOpts"></div>
+    <button class="btn" id="nextBtn" disabled>Confirm answer</button>
+    <div class="hint">Keyboard: press A, B, C or D to choose, then Enter to confirm.</div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="screen-result" class="card hidden">
+    <div id="lockedBanner" class="banner hidden">You have already completed this quiz. Only one attempt is allowed. Your results are shown below.</div>
+    <div class="res-head">
+      <div class="who">
+        <div class="lbl">Student</div>
+        <div class="name" id="rName"></div>
+        <div style="color:var(--muted);font-size:14px;margin-top:4px">Session 2 quiz · Data Engineering and the ML Pipeline</div>
+      </div>
+      <div class="score">
+        <div class="big" id="rScore">0<small>/20</small></div>
+        <div class="pct" id="rPct"></div>
+      </div>
+    </div>
+    <div class="meta">
+      <div><div class="l">Completed</div><div class="v" id="rDate"></div></div>
+      <div><div class="l">Attempt ID</div><div class="v" id="rId"></div></div>
+      <div><div class="l">Verification code</div><div class="v" id="rCode"></div></div>
+      <div><div class="l">Left the tab</div><div class="v" id="rLeft"></div></div>
+    </div>
+    <div class="grid" id="rGrid"></div>
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>Correct</span>
+      <span><i style="background:var(--bad)"></i>Incorrect</span>
+      <span><i style="background:var(--idle)"></i>No answer (time out)</span>
+    </div>
+    <div class="shot" id="shotMsg"></div>
+  </section>
+
+  <!-- TEACHER VERIFY (open the page with #verify) -->
+  <section id="screen-verify" class="card hidden">
+    <h1>Verify a screenshot</h1>
+    <p class="lead">Type the details exactly as they appear on the student's screenshot.</p>
+    <div class="row2">
+      <div class="field"><label for="vLast">Family name</label><input id="vLast"></div>
+      <div class="field"><label for="vFirst">First name</label><input id="vFirst"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="vScore">Score (out of 20)</label><input id="vScore" inputmode="numeric"></div>
+      <div class="field"><label for="vId">Attempt ID</label><input id="vId"></div>
+    </div>
+    <div class="field"><label for="vCode">Verification code</label><input id="vCode"></div>
+    <button class="btn" id="vBtn">Check</button>
+    <p id="vOut" style="margin-top:14px;font-weight:700"></p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= SETTINGS (edit here) ================= */
+const QUIZ_ID   = "aidb-s2-dataeng-2026";   // change for each new quiz so attempts don't collide
+const SECONDS   = 35;
+const SALT      = "EMLV-AIDB-S2-7q4m";      // used for the verification code
+const SUBMIT_TEXT = "<b>Take a screenshot of this whole screen now</b> and submit it as instructed by your professor. Your name, score, attempt ID and verification code must be visible.";
+const PREVIEW_KEY = "teacher";              // open index.html?preview=teacher to test without being locked out
+/* ======================================================== */
+
+const QUESTIONS = [
+ { topic:"Types of data",
+   q:"Maison Verdier's e-commerce team exports its website click logs. Each record is a JSON object with labelled fields (page, timestamp, device), but different events carry different fields. How should this data be classified?",
+   o:["Semi-structured: labelled fields, but no fixed table format",
+      "Structured: it has named fields, so it already fits rows and columns",
+      "Unstructured: like emails and photos, it has no format at all",
+      "Structured, because it is generated automatically by a system"], a:0 },
+ { topic:"AI-ready data",
+   q:"The CIO of a retail bank tells the board: \"Our customer database is 99% clean, so our data is AI-ready.\" A fraud-detection project is next. What is the most accurate response?",
+   o:["Readiness depends on the use case: the data must represent fraud, including its errors, outliers and rare cases",
+      "Clean data is AI-ready by definition, so the fraud project can start immediately",
+      "Data only becomes AI-ready once it has been copied into a data lake",
+      "AI-readiness is mainly about buying a larger and faster storage platform"], a:0 },
+ { topic:"Warehouse, lake, lakehouse",
+   q:"Three years ago, a hotel group copied every raw file (booking logs, PDFs, photos, sensor data) into cheap cloud storage, with no catalogue and no owners. Analysts now say they cannot find or trust anything. What has happened?",
+   o:["The data lake has become a \"data swamp\" through lack of discipline",
+      "The data warehouse has become too rigid to handle unstructured files",
+      "The lakehouse has failed because open table formats are unreliable",
+      "The streaming pipeline has overloaded the storage layer with events"], a:0 },
+ { topic:"Roles in a data team",
+   q:"At Maison Verdier, Marketing counts an \"active customer\" as anyone who bought in the last 24 months; Finance uses 12 months. The churn dashboard shows two different numbers. Who should settle the definition?",
+   o:["The data owner: a business manager accountable for the customer data domain",
+      "The data engineer, because they built the pipeline that computes the figure",
+      "The ML engineer, because the churn model will consume the figure",
+      "The cloud vendor, because the data is stored on its platform"], a:0 },
+ { topic:"Batch or streaming",
+   q:"A payment provider wants to block fraudulent card payments before they are approved at the till. Which pipeline design fits this need?",
+   o:["Streaming: score each transaction, event by event, as it happens",
+      "Batch: copy all the day's transactions into the warehouse every night",
+      "Batch: produce a weekly report listing suspicious transactions",
+      "Manual: have analysts review a sample of payments each morning"], a:0 },
+ { topic:"ETL or ELT",
+   q:"A private health insurer is building a new data pipeline. Its legal team insists that patient identifiers must be masked before any data is stored in the cloud warehouse. Which approach best matches this constraint?",
+   o:["ETL: transform (mask) the data first, then load only what is ready",
+      "ELT: load all the raw data first, then mask it later inside the warehouse",
+      "Zero-ETL: let the cloud provider decide where masking should happen",
+      "No pipeline: let each analyst mask the data in their own spreadsheet"], a:0 },
+ { topic:"Data quality",
+   q:"In the loyalty table, \"Jean Dupont\" and \"DUPONT Jean\" appear with the same email, the same store and the same 249 € basket on the same day. Which data-quality dimension is mainly violated?",
+   o:["Uniqueness: the same customer purchase is recorded twice",
+      "Timeliness: the data was not up to date when it was used",
+      "Completeness: a required field, such as the email, is missing",
+      "Validity: the record breaks a rule, such as a date in the future"], a:0 },
+ { topic:"Bad data in models",
+   q:"An ad-tech company discovers that a large client has been sending it corrupted data for months, and its targeting models learned from it. To recover, management asks: \"Which models must be retrained?\" Which capability answers this question?",
+   o:["Data lineage: knowing which data went into which model",
+      "A larger data warehouse that keeps more years of history",
+      "A switch from batch ingestion to real-time streaming",
+      "A new dashboard showing this month's advertising revenue"], a:0 },
+ { topic:"Data detective",
+   q:"Monday, 9:00. The dashboard shows weekend store returns up 104% versus the last eight weekends. The CEO wants to tighten the returns policy by noon. As an advisor, what is the best first move?",
+   o:["Use the hour to check data causes (a duplicated load, a pipeline error) as well as real-world causes, before acting",
+      "Approve the new policy at noon: the dashboard is the company's official source of truth",
+      "Retrain the demand-forecasting model on the weekend's data before deciding anything",
+      "Delete the weekend's data so that it does not distort the monthly report"], a:0 },
+ { topic:"EU AI Act, Article 10",
+   q:"A software firm sells a CV-screening tool, a high-risk system under the EU AI Act. It was trained only on CVs of past hires from one country and one industry, yet it is sold across Europe. Which Article 10 requirement is most at risk?",
+   o:["Training data must be relevant and sufficiently representative",
+      "Training data must be stored in a lakehouse using open formats",
+      "Training data must be moved by streaming rather than by batch",
+      "Training data must be labelled by an external specialist vendor"], a:0 },
+ { topic:"Embeddings",
+   q:"A customer types: \"My sofa arrived broken, can I get my money back?\" The policy says: \"Furniture damaged on delivery: refund or replacement within 30 days.\" Keyword search finds nothing. Why would an embedding-based search find the passage?",
+   o:["Embeddings place texts with similar meaning close together, even when they share no words",
+      "Embeddings turn the question into SQL that matches exact values in the policy table",
+      "Embeddings store every synonym of every word in one very large spreadsheet",
+      "Embeddings retrain the language model on the returns policy for each question"], a:0 },
+ { topic:"Preparing documents",
+   q:"An internal HR chatbot built on a vector database answers an intern's question by quoting the CEO's salary. Which step of the document-preparation process most likely failed?",
+   o:["Tagging: passages were stored without metadata on who may see them",
+      "Extraction: the PDF files were scanned at too low a resolution",
+      "Embedding: the numbers failed to capture the meaning of the salary file",
+      "Collection: too few documents were gathered from the shared drive"], a:0 },
+ { topic:"RAG",
+   q:"Maison Verdier's RAG customer chatbot keeps quoting the 2023 returns policy (14 days) instead of the 2026 policy (30 days). What is the most appropriate fix?",
+   o:["Remove the outdated document from the vector database and name someone to keep documents current",
+      "Retrain the underlying language model from scratch on the 2026 returns policy",
+      "Increase the number of passages retrieved for each question from 3 to 30",
+      "Move from a dedicated vector database to PostgreSQL with the pgvector extension"], a:0 },
+ { topic:"GDPR and vector databases",
+   q:"A customer exercises her GDPR right to erasure. Her emails were deleted from the CRM, but passages from them had been embedded into the support chatbot's vector database. What must the company do?",
+   o:["Delete her embedded copies too: the right to erasure applies to them as well",
+      "Nothing more: embeddings are only numbers, so they are not personal data",
+      "Keep the embeddings, as long as the chatbot never displays her name",
+      "Anonymise the CRM record only; the vector database is outside GDPR"], a:0 },
+ { topic:"Which kind of learning?",
+   q:"Maison Verdier has five years of loyalty data in which every past member is marked \"left\" or \"stayed\". Marketing wants to predict which current members will stop buying in the next three months. Which approach fits?",
+   o:["Supervised learning (classification), because past examples carry a known label",
+      "Unsupervised clustering, because customers must be grouped before anything else",
+      "Reinforcement learning, because the model must be rewarded for each correct guess",
+      "Supervised regression, because the output is an amount in euros"], a:0 },
+ { topic:"Which kind of learning?",
+   q:"The supply-chain director wants a model that forecasts how many sofas each store will sell next month, using several years of past sales. What type of task is this?",
+   o:["Supervised regression: predicting a number from past examples",
+      "Supervised classification: predicting a category, such as fraud or not",
+      "Unsupervised association: finding products that are bought together",
+      "Unsupervised anomaly detection: spotting unusual weeks of sales"], a:0 },
+ { topic:"Which kind of learning?",
+   q:"Finance suspects refund fraud in some stores but has no confirmed fraud cases to learn from. It wants an alert whenever a store's refund pattern looks unusual. Which approach fits best?",
+   o:["Unsupervised anomaly detection on the refund data",
+      "Supervised classification trained on labelled fraud cases",
+      "Supervised regression to forecast next month's refunds",
+      "A RAG chatbot built over the company's refunds policy"], a:0 },
+ { topic:"Unsupervised learning",
+   q:"A data scientist runs a clustering algorithm on 2 million customers and presents seven segments with catchy names. What should the marketing director do before building campaigns on them?",
+   o:["Check the segments are stable, understandable and actionable: clustering always finds groups, even in random data",
+      "Accept them as they are: unsupervised models are objective because no human labels were involved",
+      "Ask for the accuracy score of each segment, measured against the labelled answer key",
+      "Ask for twenty segments instead, since more segments always mean more precise targeting"], a:0 },
+ { topic:"Evaluating a model",
+   q:"A vendor pitches a churn model with \"95% accuracy\", measured on the same data it was trained on. Only 5% of your customers churn each year. What is the key question to ask?",
+   o:["How does it perform on unseen data, compared with a simple baseline?",
+      "How quickly can the model be deployed across all of our stores?",
+      "Can accuracy reach 99% if we train longer on the same data?",
+      "Which programming language and framework were used to build it?"], a:0 },
+ { topic:"The ML pipeline",
+   q:"An online property platform's pricing model was accurate at launch. Eighteen months later, after interest rates rose sharply, its valuations are systematically too high and the business is losing money. What best explains this?",
+   o:["Data drift: the world changed, and monitoring and retraining were missing",
+      "Too many labels: the model needed fewer training examples to stay accurate",
+      "A storage failure: the data lake lost part of its historical records",
+      "Hallucination: the model invented property prices that did not exist"], a:0 }
+];
+
+const N = QUESTIONS.length;
+const LETTERS = ["A","B","C","D"];
+const params = new URLSearchParams(location.search);
+const PREVIEW = params.get("preview") === PREVIEW_KEY;
+const STORE_KEY = "quiz:" + QUIZ_ID;
+
+const $ = id => document.getElementById(id);
+const screens = ["start","quiz","result","verify"];
+function show(name){ screens.forEach(s => $("screen-"+s).classList.toggle("hidden", s!==name)); window.scrollTo(0,0); }
+
+/* ---------- storage (localStorage + cookie backup) ---------- */
+let memState = null;
+function save(st){
+  memState = st;
+  if (PREVIEW) return;
+  const json = JSON.stringify(st);
+  try { localStorage.setItem(STORE_KEY, json); } catch(e){}
+  try { document.cookie = STORE_KEY.replace(/[^a-z0-9-]/gi,"_") + "=" + encodeURIComponent(st.status + "|" + (st.attemptId||"")) + ";max-age=31536000;path=/;SameSite=Lax"; } catch(e){}
+}
+function load(){
+  if (PREVIEW) return memState;
+  try { const s = localStorage.getItem(STORE_KEY); if (s) return JSON.parse(s); } catch(e){}
+  return null;
+}
+function cookieFlag(){
+  try {
+    const k = STORE_KEY.replace(/[^a-z0-9-]/gi,"_") + "=";
+    const c = document.cookie.split("; ").find(x => x.indexOf(k)===0);
+    return c ? decodeURIComponent(c.slice(k.length)) : null;
+  } catch(e){ return null; }
+}
+
+/* ---------- helpers ---------- */
+function shuffle(arr){ const a = arr.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function hash(str){ // FNV-1a 32-bit, twice with different seeds, base36
+  let h1 = 0x811c9dc5, h2 = 0x01000193 ^ 0x5bd1e995;
+  for (let i=0;i<str.length;i++){ const c=str.charCodeAt(i); h1 ^= c; h1 = Math.imul(h1, 16777619); h2 ^= c; h2 = Math.imul(h2, 2246822519); }
+  return ((h1>>>0).toString(36) + (h2>>>0).toString(36)).toUpperCase().slice(0,8);
+}
+function norm(s){ return (s||"").trim().replace(/\s+/g," "); }
+function codeFor(last, first, score, id){ return hash([norm(last).toUpperCase(), norm(first).toLowerCase(), String(score), norm(id).toUpperCase(), SALT].join("|")); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ---------- start screen ---------- */
+function validStart(){
+  const ok = norm($("lastName").value).length>=2 && norm($("firstName").value).length>=2 && $("honour").checked;
+  $("startBtn").disabled = !ok;
+}
+["lastName","firstName"].forEach(id => $(id).addEventListener("input", validStart));
+$("honour").addEventListener("change", validStart);
+$("startBtn").addEventListener("click", () => {
+  if (!PREVIEW && (load() || cookieFlag())) { renderLocked(); return; }
+  const last = norm($("lastName").value).toUpperCase();
+  const first = norm($("firstName").value);
+  const st = {
+    v:1, status:"in_progress",
+    last, first: first.charAt(0).toUpperCase() + first.slice(1),
+    attemptId: "S2-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random()*1296).toString(36).toUpperCase().padStart(2,"0"),
+    order: shuffle([...Array(N).keys()]),
+    optOrder: Array.from({length:N}, () => shuffle([0,1,2,3])),
+    answers: [], current: 0, leftTab: 0, startedAt: Date.now()
+  };
+  save(st);
+  state = st;
+  show("quiz");
+  renderQuestion();
+});
+
+/* ---------- quiz ---------- */
+let state = null, selected = null, deadline = 0, tick = null, locked = false;
+const ARC_LEN = 94.25;
+
+function renderQuestion(notice){
+  locked = false; selected = null;
+  const qi = state.order[state.current];
+  const Q = QUESTIONS[qi];
+  $("qNum").textContent = state.current + 1;
+  $("qTotal").textContent = N;
+  $("bar").style.width = (state.current / N * 100) + "%";
+  $("qTopic").textContent = Q.topic;
+  $("qText").textContent = Q.q;
+  const box = $("qOpts"); box.innerHTML = "";
+  state.optOrder[state.current].forEach((origIdx, pos) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt"; b.dataset.pos = pos;
+    b.innerHTML = '<span class="k">'+LETTERS[pos]+'</span><span>'+esc(Q.o[origIdx])+'</span>';
+    b.addEventListener("click", () => pick(pos));
+    box.appendChild(b);
+  });
+  $("nextBtn").disabled = true;
+  $("nextBtn").textContent = state.current === N-1 ? "Confirm and finish" : "Confirm answer";
+  const rn = $("reloadNotice");
+  if (notice){ rn.textContent = notice; rn.classList.remove("hidden"); } else rn.classList.add("hidden");
+  // persist the moment this question was shown, so a reload cannot reset the clock
+  state.shownAt = Date.now(); save(state);
+  deadline = state.shownAt + SECONDS*1000;
+  clearInterval(tick); updateTimer(); tick = setInterval(updateTimer, 200);
+}
+function pick(pos){
+  if (locked) return;
+  selected = pos;
+  [...$("qOpts").children].forEach(el => el.classList.toggle("sel", Number(el.dataset.pos)===pos));
+  $("nextBtn").disabled = false;
+}
+function updateTimer(){
+  const ms = Math.max(0, deadline - Date.now());
+  const s = Math.ceil(ms/1000);
+  $("tLeft").textContent = s;
+  $("arc").style.strokeDashoffset = ARC_LEN * (1 - ms/(SECONDS*1000));
+  $("timer").classList.toggle("low", s <= 10);
+  if (ms <= 0) submitAnswer(true);
+}
+function submitAnswer(timedOut){
+  if (locked) return; locked = true;
+  clearInterval(tick);
+  const qi = state.order[state.current];
+  const orig = selected===null ? null : state.optOrder[state.current][selected];
+  state.answers.push({ q:qi, choice:orig, correct: orig===QUESTIONS[qi].a, timeout: selected===null });
+  state.current++;
+  if (state.current >= N) return finish();
+  save(state);
+  setTimeout(() => renderQuestion(), timedOut ? 250 : 120);
+}
+$("nextBtn").addEventListener("click", () => { if (selected!==null) submitAnswer(false); });
+document.addEventListener("keydown", e => {
+  if ($("screen-quiz").classList.contains("hidden")) return;
+  const k = e.key.toUpperCase();
+  const i = LETTERS.indexOf(k);
+  if (i>=0) { pick(i); e.preventDefault(); }
+  else if (e.key==="Enter" && selected!==null) { submitAnswer(false); e.preventDefault(); }
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && state && state.status==="in_progress") { state.leftTab++; save(state); }
+});
+window.addEventListener("beforeunload", e => {
+  if (state && state.status==="in_progress") { e.preventDefault(); e.returnValue = ""; }
+});
+document.addEventListener("contextmenu", e => { if (state && state.status==="in_progress") e.preventDefault(); });
+document.addEventListener("copy", e => { if (state && state.status==="in_progress") e.preventDefault(); });
+
+/* ---------- finish & results ---------- */
+function finish(){
+  state.status = "done";
+  state.finishedAt = Date.now();
+  state.score = state.answers.filter(a => a.correct).length;
+  state.code = codeFor(state.last, state.first, state.score, state.attemptId);
+  save(state);
+  renderResults(false);
+}
+function renderResults(alreadyDone){
+  const st = state;
+  $("lockedBanner").classList.toggle("hidden", !alreadyDone);
+  $("rName").textContent = st.last + ", " + st.first;
+  $("rScore").innerHTML = st.score + "<small>/" + N + "</small>";
+  $("rPct").textContent = Math.round(st.score/N*100) + "% correct";
+  const d = new Date(st.finishedAt);
+  $("rDate").textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) + " · " + d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  $("rId").textContent = st.attemptId;
+  $("rCode").textContent = PREVIEW ? "PREVIEW" : st.code;
+  $("rLeft").textContent = st.leftTab === 0 ? "Never" : st.leftTab + (st.leftTab===1?" time":" times");
+  const g = $("rGrid"); g.innerHTML = "";
+  st.answers.forEach((a, i) => {
+    const c = document.createElement("div");
+    c.className = "cell " + (a.timeout ? "c-to" : a.correct ? "c-ok" : "c-bad");
+    c.innerHTML = "Q" + (i+1) + "<span>" + (a.timeout ? "–" : a.correct ? "✓" : "✗") + "</span>";
+    g.appendChild(c);
+  });
+  $("shotMsg").innerHTML = SUBMIT_TEXT;
+  $("bar").style.width = "100%";
+  show("result");
+}
+function renderLocked(){
+  const st = load();
+  if (st && st.status==="done"){ state = st; renderResults(true); return; }
+  // cookie says an attempt exists but localStorage was cleared
+  $("screen-result").classList.add("hidden");
+  show("start");
+  $("startErr").textContent = "An attempt has already been recorded in this browser. Only one attempt is allowed.";
+  $("startBtn").disabled = true;
+  ["lastName","firstName","honour"].forEach(id => $(id).disabled = true);
+}
+
+/* ---------- teacher verification (#verify) ---------- */
+$("vBtn").addEventListener("click", () => {
+  const ok = codeFor($("vLast").value, $("vFirst").value, norm($("vScore").value), $("vId").value) === norm($("vCode").value).toUpperCase();
+  const out = $("vOut");
+  out.textContent = ok ? "✓ Valid: the code matches this name, score and attempt ID." : "✗ Does not match. Check spelling, or the screenshot may have been edited.";
+  out.style.color = ok ? "var(--ok)" : "var(--bad)";
+});
+
+/* ---------- boot ---------- */
+function boot(){
+  if (PREVIEW) $("previewBar").classList.remove("hidden");
+  if (location.hash === "#verify"){ show("verify"); return; }
+  const st = load();
+  if (st && st.status==="done"){ state = st; renderResults(true); return; }
+  if (st && st.status==="in_progress"){
+    state = st;
+    // the question on screen at reload is counted as unanswered
+    const lost = state.current + 1;
+    const qi = state.order[state.current];
+    state.answers.push({ q:qi, choice:null, correct:false, timeout:true });
+    state.current++;
+    if (state.current >= N){ finish(); return; }
+    save(state);
+    show("quiz");
+    renderQuestion("The page was reloaded or closed: question " + lost + " has been counted as unanswered.");
+    return;
+  }
+  if (cookieFlag()){ renderLocked(); return; }
+  show("start");
+}
+window.addEventListener("hashchange", boot);
+boot();
+})();
+</script>
+</body>
+</html>
